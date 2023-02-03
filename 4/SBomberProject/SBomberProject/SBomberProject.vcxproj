@@ -150,6 +150,7 @@
     <ClCompile Include="SBomberProject.cpp" />
     <ClCompile Include="Tank.cpp" />
     <ClCompile Include="TankAdaptee.cpp" />
+    <ClCompile Include="Tree.cpp" />
     <ClCompile Include="WinterFactory.cpp" />
     <ClCompile Include="WinterGround.cpp" />
     <ClCompile Include="WinterHouse.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="SBomber.h" />
     <ClInclude Include="Tank.h" />
     <ClInclude Include="TankAdaptee.h" />
+    <ClInclude Include="Tree.h" />
     <ClInclude Include="WinterFactory.h" />
     <ClInclude Include="WinterGround.h" />
     <ClInclude Include="WinterHouse.h" />

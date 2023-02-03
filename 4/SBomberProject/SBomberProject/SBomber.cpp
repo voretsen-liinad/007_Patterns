@@ -1,6 +1,7 @@
 
 #include <conio.h>
 #include <windows.h>
+#include <iostream>
 
 #include "MyTools.h"
 #include "SBomber.h"
@@ -8,10 +9,54 @@
 #include "WinterGround.h"
 #include "WinterTank.h"
 #include "WinterHouse.h"
+#include "Tree.h"
 
 using namespace std;
 using namespace MyTools;
 
+void CollisionDetector::CheckPlaneAndLevelGUI(Plane* pPlane, AbstractLevelGUI* pLevelGUI) {
+    if (pPlane->GetX() > pLevelGUI->GetFinishX())
+    {
+        sBomber->SetExitFlag(true);
+    }
+}
+
+void CollisionDetector::CheckBombsAndGround(vector<Bomb*> vecBombs, Ground* pGround, vector<DynamicObject*>& vecDynamicObj, vector<DestroyableGroundObject*> vecDestoyableObjects, vector<GameObject*>& vecStaticObj) {
+    //vector<Bomb*> vecBombs = FindAllBombs();
+    //Ground* pGround = FindGround();
+    const double y = pGround->GetY();
+    for (size_t i = 0; i < vecBombs.size(); i++)
+    {
+        if (vecBombs[i]->GetY() >= y) // Пересечение бомбы с землей
+        {
+            pGround->AddCrater(vecBombs[i]->GetX());
+            CheckDestoyableObjects(vecDestoyableObjects, vecBombs[i], vecStaticObj);
+            //DeleteDynamicObj(vecBombs[i]);
+            AbstractCommand<DynamicObject>* pDeleteDynamicObj = new DeleteObjCommand<DynamicObject>;
+            pDeleteDynamicObj->SetParams(vecBombs[i], vecDynamicObj);
+            sBomber->CommandExecuter(pDeleteDynamicObj);
+        }
+    }
+}
+
+void __fastcall CollisionDetector::CheckDestoyableObjects(vector<DestroyableGroundObject*>& vecDestoyableObjects, Bomb* pBomb, vector<GameObject*>& vecStaticObj) {
+    //vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
+    const double size = pBomb->GetWidth();
+    const double size_2 = size / 2;
+    for (size_t i = 0; i < vecDestoyableObjects.size(); i++)
+    {
+        const double x1 = pBomb->GetX() - size_2;
+        const double x2 = x1 + size;
+        if (vecDestoyableObjects[i]->isInside(x1, x2))
+        {
+            sBomber->AddScore(vecDestoyableObjects[i]->GetScore());
+            //DeleteStaticObj(vecDestoyableObjects[i]);
+            AbstractCommand<GameObject>* pDeleteGameObj = new DeleteObjCommand<GameObject>;
+            pDeleteGameObj->SetParams(vecDestoyableObjects[i], vecStaticObj);
+            sBomber->CommandExecuter(pDeleteGameObj);
+        }
+    }
+}
 
 SBomber::SBomber()
     : exitFlag(false),
@@ -23,6 +68,12 @@ SBomber::SBomber()
     bombsNumber(10),
     score(0)
 {
+    char answer = ' ';
+    while (answer != 'a' && answer != 'A' && answer != 'b' && answer != 'B') {
+        std::cout << "What kind of house would you like to have? Enter A or B: ";
+        std::cin >> answer;
+    }
+    
     //MyTools::FileLoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
     MyTools::LoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
 
@@ -48,6 +99,19 @@ SBomber::SBomber()
     pFactory = new WinterFactory;
     pFactory->CreateLevel1(vecStaticObj);
 
+    HouseDirector HouseDir;
+    House* pHouse;
+    if (answer == 'a' || answer == 'A') {
+        HouseBuilderA HouseA;
+        pHouse = HouseDir.Construct(HouseA);
+    }
+    else {
+        HouseBuilderB HouseB;
+        pHouse = HouseDir.Construct(HouseB);
+    }
+    pHouse->SetWidth(13);
+    pHouse->SetPos(80, MyTools::ScreenSingleton::getInstance().GetMaxY() - 6);
+    vecStaticObj.push_back(pHouse);
 
     /*
     Ground* pGr = new Ground;
@@ -56,12 +120,12 @@ SBomber::SBomber()
     pGr->SetWidth(width - 2);
     vecStaticObj.push_back(pGr);
 
-    Tank* pTank = new Tank;
+    TankAdapter* pTank = new TankAdapter;
     pTank->SetWidth(13);
     pTank->SetPos(30, groundY - 1);
     vecStaticObj.push_back(pTank);
 
-    pTank = new Tank;
+    pTank = new TankAdapter;
     pTank->SetWidth(13);
     pTank->SetPos(50, groundY - 1);
     vecStaticObj.push_back(pTank);
@@ -139,10 +203,14 @@ void SBomber::CheckObjects()
     //MyTools::FileLoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
     MyTools::LoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
 
-    CheckPlaneAndLevelGUI();
-    CheckBombsAndGround();
+    //CheckPlaneAndLevelGUI();
+    CollisionFinder->CheckPlaneAndLevelGUI(FindPlane(), FindLevelGUI());
+
+    //CheckBombsAndGround();
+    CollisionFinder->CheckBombsAndGround(FindAllBombs(), FindGround(), vecDynamicObj, FindDestoyableGroundObjects(), vecStaticObj);
 };
 
+/*
 void SBomber::CheckPlaneAndLevelGUI()
 {
     if (FindPlane()->GetX() > FindLevelGUI()->GetFinishX())
@@ -170,7 +238,7 @@ void SBomber::CheckBombsAndGround()
         }
     }
 }
-
+*/
 /*
 void SBomber::CheckBombsAndGround()
 {
@@ -193,7 +261,7 @@ void SBomber::CheckBombsAndGround()
 */
 
 
-
+/*
 void SBomber::CheckDestoyableObjects(Bomb * pBomb)
 {
     vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
@@ -213,7 +281,7 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
         }
     }
 }
-
+*/
 /*
 void SBomber::CheckDestoyableObjects(BombDecorator* pBomb)
 {
@@ -270,6 +338,7 @@ vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const
     //Tank* pTank;
     TankAdapter* pTank;
     House* pHouse;
+    DestroyableGroundObject* pTree;
     for (size_t i = 0; i < vecStaticObj.size(); i++)
     {
         //pTank = dynamic_cast<Tank*>(vecStaticObj[i]);
@@ -284,6 +353,13 @@ vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const
         if (pHouse != nullptr)
         {
             vec.push_back(pHouse);
+            continue;
+        }
+
+        pTree = dynamic_cast<DestroyableGroundObject*>(vecStaticObj[i]);
+        if (pTree != nullptr)
+        {
+            vec.push_back(pTree);
             continue;
         }
     }
@@ -413,9 +489,9 @@ void SBomber::ProcessKBHit()
         //pDropBomb->SetParams(FindPlane(), vecDynamicObj, bombsNumber);
         //CommandExecuter(pDropBomb);
         //AbstractCommand<DynamicObject>* pDropBombDecorator = new DropBombDecoratorCommand<DynamicObject>;
-        AbstractCommand<DynamicObject>* pDropBombDecorator = new DropBombCommand<DynamicObject>;
-        pDropBombDecorator->SetParams(FindPlane(), vecDynamicObj, bombsNumber);
-        CommandExecuter(pDropBombDecorator);
+        AbstractCommand<DynamicObject>* pDropBomb = new DropBombCommand<DynamicObject>;
+        pDropBomb->SetParams(FindPlane(), vecDynamicObj, bombsNumber);
+        CommandExecuter(pDropBomb);
         bombsNumber--;
         score -= Bomb::BombCost;
         break;
@@ -427,9 +503,9 @@ void SBomber::ProcessKBHit()
         //pDropBomb->SetParams(FindPlane(), vecDynamicObj, bombsNumber);
         //CommandExecuter(pDropBomb);
         //AbstractCommand<DynamicObject>* pDropBombDecorator = new DropBombDecoratorCommand<DynamicObject>;
-        AbstractCommand<DynamicObject>* pDropBombDecorator = new DropBombCommand<DynamicObject>;
-        pDropBombDecorator->SetParams(FindPlane(), vecDynamicObj, bombsNumber);
-        CommandExecuter(pDropBombDecorator);
+        AbstractCommand<DynamicObject>* pDropBomb = new DropBombCommand<DynamicObject>;
+        pDropBomb->SetParams(FindPlane(), vecDynamicObj, bombsNumber);
+        CommandExecuter(pDropBomb);
         bombsNumber--;
         score -= Bomb::BombCost;
         break;
@@ -442,15 +518,40 @@ void SBomber::ProcessKBHit()
     }
 
     case '1': {
-        AbstractLevelGUI* pGUI = new LevelGUI1;
-        SetLevelGUI(pGUI);
+        //AbstractLevelGUI* pGUI = new LevelGUI1;
+        //SetLevelGUI(pGUI);
+        if (pTreeCreator != nullptr) delete pTreeCreator;
+        pTreeCreator = new (std::nothrow) TreeCreatorA;
         break;
     }
 
     case '2': {
-        AbstractLevelGUI* pGUI = new LevelGUI2;
-        SetLevelGUI(pGUI);
+        //AbstractLevelGUI* pGUI = new LevelGUI2;
+        //SetLevelGUI(pGUI);
+        if (pTreeCreator != nullptr) delete pTreeCreator;
+        pTreeCreator = new (std::nothrow) TreeCreatorB;
         break;
+    }
+
+    case '+': {
+        if (pTreeCreator == nullptr) pTreeCreator = new (std::nothrow) TreeCreatorA;
+        DestroyableGroundObject* pTree;
+        auto it = vecStaticObj.begin();
+        for (; it != vecStaticObj.end(); it++)
+         {
+            pTree = dynamic_cast<TreeA*>(*it); 
+            if (pTree == nullptr) pTree = dynamic_cast<TreeB*>(*it);
+            if (pTree != nullptr)
+            {
+                vecStaticObj.erase(it);
+                break;
+            }
+        }
+        pTree = pTreeCreator->Create();
+        if (dynamic_cast<TreeA*>(pTree) != nullptr) pTree->SetWidth(8);
+        else pTree->SetWidth(9);
+        pTree->SetPos(15, MyTools::ScreenSingleton::getInstance().GetMaxY() - 6);
+        vecStaticObj.push_back(pTree);
     }
 
     default:

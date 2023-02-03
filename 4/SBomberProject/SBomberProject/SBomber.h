@@ -9,6 +9,7 @@
 #include "Tank.h"
 #include "WinterFactory.h"
 #include "MyTools.h"
+#include "Tree.h"
 #include <memory>
 
 template <typename t>
@@ -109,6 +110,19 @@ protected:
     uint16_t bombsNum;
 };
 */
+
+class SBomber;
+
+class CollisionDetector {
+public:
+    CollisionDetector(SBomber* _sBomber) : sBomber(_sBomber) {};
+    void CheckPlaneAndLevelGUI(Plane* plane, AbstractLevelGUI* levelGUI); 
+    void CheckBombsAndGround(std::vector<Bomb*> vecBombs, Ground* pGround, std::vector<DynamicObject*>& vecDynamicObj, std::vector<DestroyableGroundObject*> vecDestoyableObjects, std::vector<GameObject*>& vecStaticObj);
+    void __fastcall CheckDestoyableObjects(std::vector<DestroyableGroundObject*>& vecDestoyableObjects, Bomb* pBomb, std::vector<GameObject*>& vecStaticObj);
+protected:
+    SBomber* sBomber;
+};
+
 class SBomber
 {
 public:
@@ -117,6 +131,8 @@ public:
     ~SBomber();
     
     inline bool GetExitFlag() const { return exitFlag; }
+    inline void SetExitFlag(const bool& value) { exitFlag = value; } 
+    void AddScore(const int16_t& value) { score += value; }
 
     void ProcessKBHit();
     void TimeStart();
@@ -126,21 +142,26 @@ public:
     void MoveObjects();
     void CheckObjects(); 
 
-private:
-
-    void CheckPlaneAndLevelGUI();
-    void CheckBombsAndGround();
-    void __fastcall CheckDestoyableObjects(Bomb* pBomb);
-    //void __fastcall CheckDestoyableObjects(BombDecorator* pBomb);
-
-    //void __fastcall DeleteDynamicObj(DynamicObject * pBomb);
-    //void __fastcall DeleteStaticObj(GameObject* pObj);
+protected:
+    friend class CollisionDetector;
 
     template<typename t>
     void __fastcall CommandExecuter(AbstractCommand<t>* pCommand) {
         pCommand->Execute();
         delete pCommand;
     };
+
+private:
+
+    //void CheckPlaneAndLevelGUI();
+    //void CheckBombsAndGround();
+    //void __fastcall CheckDestoyableObjects(Bomb* pBomb); 
+    //void __fastcall CheckDestoyableObjects(BombDecorator* pBomb); 
+
+    CollisionDetector* CollisionFinder = new CollisionDetector{ this };
+
+    //void __fastcall DeleteDynamicObj(DynamicObject * pBomb);
+    //void __fastcall DeleteStaticObj(GameObject* pObj);
 
     void SetLevelGUI(AbstractLevelGUI* pGUI);
 
@@ -153,6 +174,7 @@ private:
     //std::vector<BombDecorator*> FindAllBombs() const;
 
     AbstractFactory* pFactory;
+    TreeCreator* pTreeCreator;
 
     //void DropBomb();
 
@@ -165,3 +187,4 @@ private:
     uint16_t bombsNumber, deltaTime, fps;
     int16_t score;
 };
+

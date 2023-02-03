@@ -47,8 +47,8 @@ void WinterFactory::CreateLevel1(std::vector<GameObject*>& refStaticObjVec)
 	pTank->SetWidth(13);
 	pTank->SetPos(50, groundY - 1);
 	refStaticObjVec.push_back(pTank);
-	House* pHouse = CreateHouse();
-	pHouse->SetWidth(13);
-	pHouse->SetPos(80, groundY - 1);
-	refStaticObjVec.push_back(pHouse);
+	//House* pHouse = CreateHouse();
+	//pHouse->SetWidth(13);
+	//pHouse->SetPos(80, groundY - 1);
+	//refStaticObjVec.push_back(pHouse);
 }
