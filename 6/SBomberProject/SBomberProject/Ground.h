@@ -19,7 +19,7 @@ public:
 
 	bool __fastcall isInside(double xn) const;
 	
-	void Draw() const override;
+	void Draw() override;
 
 private:
 
@@ -33,7 +33,7 @@ public:
 
 	Ground() { }
 
-	void Draw() const override;
+	void Draw() override;
 
 	void __fastcall AddCrater(double xn);
 

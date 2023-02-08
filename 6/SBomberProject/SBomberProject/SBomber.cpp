@@ -1,13 +1,16 @@
 
 #include <conio.h>
 #include <windows.h>
+#include <time.h>
+#include <random>
 
 #include "MyTools.h"
 #include "SBomber.h"
-#include "DynamicObject.h"
+#include "Bomb.h"
 #include "Ground.h"
 #include "Tank.h"
 #include "House.h"
+#include "Mediator.h"
 
 using namespace std;
 using namespace MyTools;
@@ -24,9 +27,13 @@ SBomber::SBomber()
 {
     MyTools::FileLoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
 
-    Plane* p = new Plane;
+    Plane* p; 
+    srand(time(0));
+    uint16_t x = rand() % 2;
+    if (x == 0) p = new ColorPlane;
+    else p = new BigPlane;
     p->SetDirection(1, 0.1);
-    p->SetSpeed(4);
+    p->SetSpeed(10);
     p->SetPos(5, 10);
     vecDynamicObj.push_back(p);
 
@@ -48,15 +55,20 @@ SBomber::SBomber()
     pGr->SetWidth(width - 2);
     vecStaticObj.push_back(pGr);
 
-    Tank* pTank = new Tank;
+    static Mediator mediator;
+    mediator.AddReciever(pGUI);
+
+    Tank* pTank = new Tank(&mediator);
     pTank->SetWidth(13);
     pTank->SetPos(30, groundY - 1);
     vecStaticObj.push_back(pTank);
+    mediator.AddSender(pTank);
 
-    pTank = new Tank;
+    pTank = new Tank(&mediator);
     pTank->SetWidth(13);
     pTank->SetPos(50, groundY - 1);
     vecStaticObj.push_back(pTank);
+    mediator.AddSender(pTank);
 
     House * pHouse = new House;
     pHouse->SetWidth(13);
@@ -96,20 +108,10 @@ void SBomber::MoveObjects()
 {
     MyTools::FileLoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
 
-    Bomb* pBomb = nullptr;
-    Plane* pPlane = nullptr;
-
     for (size_t i = 0; i < vecDynamicObj.size(); i++)
     {
         if (vecDynamicObj[i] != nullptr)
         {
-            pBomb = dynamic_cast<Bomb*>(vecDynamicObj[i]); 
-            if (pBomb != nullptr) pBomb->Accept(LoggerVisitor);
-            else {
-                pPlane = dynamic_cast<Plane*>(vecDynamicObj[i]);
-                if (pPlane != nullptr) pPlane->Accept(LoggerVisitor);
-            }
-            
             vecDynamicObj[i]->Move(deltaTime);
         }
     }
@@ -136,28 +138,18 @@ void SBomber::CheckBombsAndGround()
     vector<Bomb*> vecBombs = FindAllBombs();
     Ground* pGround = FindGround();
     const double y = pGround->GetY();
-
-    DestroyableGroundObject* obj = nullptr;
-
     for (size_t i = 0; i < vecBombs.size(); i++)
     {
         if (vecBombs[i]->GetY() >= y) // Пересечение бомбы с землей
         {
-            obj = vecBombs[i]->CheckDestroyableObjects(); 
-            if (obj != nullptr) {
-                score += obj->GetScore();
-                DeleteStaticObj(obj);
-            }
-            
             pGround->AddCrater(vecBombs[i]->GetX());
-            
+            CheckDestoyableObjects(vecBombs[i]);
             DeleteDynamicObj(vecBombs[i]);
         }
     }
 
 }
 
-/*
 void SBomber::CheckDestoyableObjects(Bomb * pBomb)
 {
     vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
@@ -174,7 +166,6 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
         }
     }
 }
-*/
 
 void SBomber::DeleteDynamicObj(DynamicObject* pObj)
 {
@@ -202,7 +193,6 @@ void SBomber::DeleteStaticObj(GameObject* pObj)
     }
 }
 
-/*
 vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const
 {
     vector<DestroyableGroundObject*> vec;
@@ -227,7 +217,6 @@ vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const
 
     return vec;
 }
-*/
 
 Ground* SBomber::FindGround() const
 {
@@ -380,16 +369,9 @@ void SBomber::DropBomb()
 
         Bomb* pBomb = new Bomb;
         pBomb->SetDirection(0.3, 1);
-        pBomb->SetSpeed(2);
+        pBomb->SetSpeed(5);
         pBomb->SetPos(x, y);
         pBomb->SetWidth(SMALL_CRATER_SIZE);
-
-        Observer* pObserver;
-        for (size_t i = 0; i < vecStaticObj.size(); i++)
-        {
-            pObserver = dynamic_cast<Observer*>(vecStaticObj[i]);
-            if (pObserver != nullptr) pBomb->AddObserver(pObserver);
-        }
 
         vecDynamicObj.push_back(pBomb);
         bombsNumber--;

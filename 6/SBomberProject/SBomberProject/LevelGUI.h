@@ -1,8 +1,10 @@
 #pragma once
 
 #include <stdint.h>
+#include <deque>
 
 #include "GameObject.h"
+
 
 class LevelGUI : public GameObject {
 public:
@@ -16,9 +18,19 @@ public:
     inline uint16_t GetFinishX() const { return finishX; }
     inline void SetFinishX(uint16_t finishXN) { finishX = finishXN; }
 
-    void Draw() const override;
+    void Draw() override;
+
+    void BeNotified(const std::string& message) override { Messages.push_back(message); } 
+
+    uint64_t GetTime() { return time; }
+
+    void ChangeTime(const uint64_t& _time) { time += int(_time/1000); }
 
 private:
+
+    std::deque<std::string> Messages; 
+    uint16_t time = 0;
+
 
     uint16_t height;
     uint16_t finishX = 109;

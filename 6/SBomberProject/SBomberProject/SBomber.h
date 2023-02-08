@@ -3,9 +3,8 @@
 #include <vector>
 
 #include "LevelGUI.h"
-#include "DynamicObject.h"
-//#include "Plane.h"
-//#include "Bomb.h"
+#include "Plane.h"
+#include "Bomb.h"
 #include "Ground.h"
 #include "Tank.h"
 
@@ -42,8 +41,6 @@ private:
     std::vector<Bomb*> FindAllBombs() const;
 
     void DropBomb();
-
-    LogVisitor LoggerVisitor;
 
     std::vector<DynamicObject*> vecDynamicObj;
     std::vector<GameObject*> vecStaticObj;

@@ -8,7 +8,7 @@ using namespace MyTools;
 
 //==================================================================================================
 
-void Crater::Draw() const
+void Crater::Draw() 
 {
     if (width == SMALL_CRATER_SIZE) // Рисование воронки в 9 символов шириной
     {
@@ -32,7 +32,7 @@ bool Crater::isInside(double xn) const
 
 //==================================================================================================
 
-void Ground::Draw() const
+void Ground::Draw() 
 {
     MyTools::ScreenSingleton::getInstance().SetColor(CC_Green);
 

@@ -1,9 +1,0 @@
-﻿  Bomb.cpp
-  House.cpp
-  Plane.cpp
-  SBomber.cpp
-  SBomberProject.cpp
-  Tank.cpp
-  Generating Code...
-C:\Users\Danil\Desktop\007_Patterns\5\SBomberProject\SBomberProject\Bomb.cpp(34): warning C4715: 'Bomb::CheckDestroyableObjects': not all control paths return a value
-  SBomberProject.vcxproj -> C:\Users\Danil\Desktop\007_Patterns\5\SBomberProject\x64\Debug\SBomberProject.exe
