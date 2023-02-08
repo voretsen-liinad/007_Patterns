@@ -1,0 +1,3 @@
+﻿  SBomber.cpp
+C:\Users\Danil\Desktop\007_Patterns\6\SBomberProject\SBomberProject\SBomber.cpp(31,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  SBomberProject.vcxproj -> C:\Users\Danil\Desktop\007_Patterns\6\SBomberProject\x64\Debug\SBomberProject.exe
