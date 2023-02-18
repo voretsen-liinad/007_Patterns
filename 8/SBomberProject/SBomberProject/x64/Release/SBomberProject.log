@@ -1,0 +1,15 @@
+﻿  Bomb.cpp
+  Ground.cpp
+  House.cpp
+  LevelGUI.cpp
+  MyTools.cpp
+  Plane.cpp
+  SBomber.cpp
+  SBomberProject.cpp
+  Tank.cpp
+  Tree.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 537 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  SBomberProject.vcxproj -> C:\Users\Danil\Desktop\8\SBomberProject\x64\Release\SBomberProject.exe

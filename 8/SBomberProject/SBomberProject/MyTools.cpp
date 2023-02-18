@@ -9,11 +9,14 @@
 #include <fstream>
 #include <chrono>
 
+
 #include "MyTools.h"
 
 using namespace std;
 
 namespace MyTools {
+
+    ofstream logOut;
 
     //=============================================================================================
 
@@ -67,6 +70,19 @@ namespace MyTools {
 
     //=============================================================================================
 
+    void __fastcall OpenLogFile(const string& FN)
+    {
+        logOut.open(FN, ios_base::out);
+    }
+
+    void CloseLogFile()
+    {
+        if (logOut.is_open())
+        {
+            logOut.close();
+        }
+    }
+
     string GetCurDateTime()
     {
         auto cur = std::chrono::system_clock::now();
@@ -77,7 +93,7 @@ namespace MyTools {
         return string(buf);
     }
 
-    void __fastcall FileLogger::WriteToLog(const string& str)
+    void __fastcall WriteToLog(const string& str)
     {
         if (logOut.is_open())
         {
@@ -85,7 +101,7 @@ namespace MyTools {
         }
     }
 
-    void __fastcall FileLogger::WriteToLog(const string& str, int n)
+    void __fastcall WriteToLog(const string& str, int n)
     {
         if (logOut.is_open())
         {
@@ -93,7 +109,7 @@ namespace MyTools {
         }
     }
 
-    void __fastcall FileLogger::WriteToLog(const string& str, double d)
+    void __fastcall WriteToLog(const string& str, double d)
     {
         if (logOut.is_open())
         {
@@ -102,5 +118,6 @@ namespace MyTools {
     }
 
     //=============================================================================================
+
 
 } // namespace MyTools

@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <fstream>
 
 namespace MyTools {
 
@@ -41,15 +40,16 @@ namespace MyTools {
 
 	//=============================================================================================
 
-    class FileLogger {
-    public:
-        FileLogger(const std::string& file) { if (!logOut.is_open()) logOut.open(file); }; 
-        ~FileLogger() { if (logOut.is_open()) logOut.close(); }
-        void __fastcall WriteToLog(const std::string& str);
-        void __fastcall WriteToLog(const std::string& str, int n);
-        void __fastcall WriteToLog(const std::string& str, double d);
-    private:
-        std::ofstream logOut;
-    };
+	void __fastcall OpenLogFile(const std::string& FN);
+
+	void CloseLogFile();
+
+	void __fastcall WriteToLog(const std::string& str);
+
+	void __fastcall WriteToLog(const std::string& str, int n);
+
+	void __fastcall WriteToLog(const std::string& str, double d);
+
+	//=============================================================================================
 
 };

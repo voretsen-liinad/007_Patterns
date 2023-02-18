@@ -1,0 +1,4 @@
+﻿  SBomber.cpp
+C:\Users\Danil\Desktop\8\SBomberProject\SBomberProject\SBomber.cpp(385,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Danil\Desktop\8\SBomberProject\SBomberProject\SBomber.cpp(450,23): warning C4244: 'initializing': conversion from 'double' to 'size_t', possible loss of data
+  SBomberProject.vcxproj -> C:\Users\Danil\Desktop\8\SBomberProject\x64\Debug\SBomberProject.exe

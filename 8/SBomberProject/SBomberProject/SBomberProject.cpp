@@ -8,10 +8,9 @@ using namespace std;
 
 //========================================================================================================================
 
-MyTools::FileLogger logger("log.txt"); //a definition of the class "FileLogger" is in the files "MyTools.h" and "MyTools.cpp"
-
 int main(void)
 {
+    MyTools::OpenLogFile("log.txt");
 
     SBomber game;
 
@@ -32,6 +31,8 @@ int main(void)
         game.TimeFinish();
 
     } while (!game.GetExitFlag());
+    game.AnimateScrolling();
+    MyTools::CloseLogFile();
 
     return 0;
 }
